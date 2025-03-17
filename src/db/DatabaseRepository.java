@@ -2,7 +2,6 @@ package db;
 
 import db.annotations.Column;
 import db.annotations.TableName;
-import db.inserts.InsertProperties;
 import models.Book;
 import models.DBModel;
 
