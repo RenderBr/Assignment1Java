@@ -57,4 +57,9 @@ public class BorrowedBook extends DBModel {
         this.borrow_date = borrow_date;
         this.return_date = return_date;
     }
+
+    @Override
+    public String toString(){
+        return String.format("Borrowed Book, of ID: %s\n\tBorrower ID: %s\n\tBook ID: %s\n\tBorrowed Date: %s\n\tReturn Date: %s", id, borrowerId, bookId, borrow_date.toString(), (return_date == null ? "has not been returned!" : return_date.toString()));
+    }
 }

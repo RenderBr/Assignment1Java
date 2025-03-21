@@ -4,6 +4,8 @@ import db.annotations.Column;
 import db.annotations.TableName;
 import models.DBModel;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,16 +16,25 @@ import java.util.ArrayList;
 public class Database {
     private static Database instance;
     private Connection connection;
-    private final String connectionString = "jdbc:sqlite:./resources/database.sqlite";
+    private final String databaseFile = "./resources/database.sqlite";
+    private final String connectionString = "jdbc:sqlite:" + databaseFile;
 
 
     private Database()
     {
         try {
+            // create db file if not exists
+            File f = new File(databaseFile);
+            if(f.createNewFile()){
+                System.out.println("Database file has been created automatically.");
+            }
+
             connection = DriverManager.getConnection(connectionString);
         } catch (SQLException exception) {
             exception.printStackTrace();
             throw new RuntimeException(exception);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -4,10 +4,12 @@ import models.*;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 public class LibraryService {
     public DatabaseRepository<Book> bookRepository;
@@ -36,6 +38,8 @@ public class LibraryService {
             put(5, new LibraryAction("Add a new borrower", () -> addBorrower()));
             put(6, new LibraryAction("List all borrowers", () -> listObjects(borrowerRepository)));
             put(7, new LibraryAction("Borrow a book", () -> borrowBook()));
+            put(8, new LibraryAction("Return a book", () -> returnBook()));
+            put(9, new LibraryAction("View all borrowed books", () -> listBorrowedBooks()));
             put(0, new LibraryAction("Exit", () -> exitLibrary()));
         }};
     }
@@ -81,9 +85,9 @@ public class LibraryService {
 
         var borrowedBook = new BorrowedBook(book, borrower);
 
-        var existing = borrowedBooksRepository.filter(bb -> bb.borrowerId == borrower.id && bb.bookId == book.id);
+        var existing = borrowedBooksRepository.filter(bb -> bb.borrowerId == borrower.id && bb.bookId == book.id && bb.return_date == null);
 
-        if(!existing.isEmpty()){
+        if (!existing.isEmpty()) {
             output.printf("This book has already been borrowed by this user, with a BorrowedBook ID of: %s", existing.getFirst().id);
             return;
         }
@@ -92,8 +96,95 @@ public class LibraryService {
 
         book.availableCopies--;
         bookRepository.update(book);
-        output.printf("%s has borrowed the book '%s'. There are now %s copies left for %s.", borrower.name, book.title,
+        output.printf("%s has borrowed the book '%s'. There are now %s copies left for %s.\n", borrower.name, book.title,
                 book.availableCopies, book.title);
+    }
+
+    private void returnBook() {
+        var book = findBookFromInput();
+        if (book == null) {
+            return;
+        }
+
+        var borrower = findBorrowerFromInput();
+        if (borrower == null) {
+            return;
+        }
+
+        var existing = borrowedBooksRepository.filter(bb -> bb.borrowerId == borrower.id && bb.bookId == book.id && bb.return_date == null);
+
+        if (existing.isEmpty()) {
+            output.printf("The book: %s has not been borrowed by the user: %s\n", book.title, borrower.name);
+            return;
+        }
+
+        // do foreach in case for some reason there are multiple entries for this book and user unreturned
+        existing.forEach(bb -> {
+            bb.return_date = new Date(System.currentTimeMillis());
+            borrowedBooksRepository.update(bb);
+
+            book.availableCopies++;
+            bookRepository.update(book);
+        });
+
+        output.printf("%s has returned the book '%s'. There are now %s copies left for %s.\n", borrower.name, book.title,
+                book.availableCopies, book.title);
+    }
+
+    private void listBorrowedBooks() {
+        output.println("What kind of search would you like to do? Type one of the following: user, book, none");
+        var searchTypeInput = scanner.nextLine().strip();
+        Predicate<BorrowedBook> filter;
+        boolean all = false;
+
+        switch (searchTypeInput) {
+            case "u":
+            case "user":
+            case "borrower": {
+                var user = findBorrowerFromInput();
+
+                if (user == null) {
+                    output.println("Invalid user. Please re-run this command.");
+                    return;
+                }
+
+                filter = (borrowedBook -> borrowedBook.borrowerId == user.id && borrowedBook.return_date == null);
+                break;
+            }
+            case "b":
+            case "book": {
+                var book = findBookFromInput();
+
+                if (book == null) {
+                    output.println("Invalid book. Please re-run this command.");
+                    return;
+                }
+
+                filter = (borrowedBook -> borrowedBook.bookId == book.id && borrowedBook.return_date == null);
+                break;
+            }
+            default: // all search
+            {
+                filter = (borrowedBook -> borrowedBook.return_date == null);
+                all = true;
+                break;
+            }
+        }
+
+        var borrowedBooks = borrowedBooksRepository.filter(filter);
+
+        if (borrowedBooks.isEmpty() && all) {
+            output.println("There are no borrowed books that need returning.");
+            return;
+        } else if (borrowedBooks.isEmpty()) {
+            output.println("We could not find any borrowed books with this filter.");
+            return;
+        }
+
+        output.printf("There are %s currently borrowed books matching this query:\n", borrowedBooks.size());
+        borrowedBooks.forEach(borrowedBook ->{
+            output.println(borrowedBook);
+        });
     }
 
     private Borrower findBorrowerFromInput() {
@@ -144,8 +235,7 @@ public class LibraryService {
         return bookSearch.getFirst();
     }
 
-    private void deleteBook()
-    {
+    private void deleteBook() {
         var book = findBookFromInput();
 
         if (book == null) {
