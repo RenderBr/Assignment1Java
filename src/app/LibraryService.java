@@ -1,3 +1,5 @@
+package app;
+
 import db.Database;
 import db.DatabaseRepository;
 import models.*;
