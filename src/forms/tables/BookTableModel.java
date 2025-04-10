@@ -5,7 +5,6 @@ import models.Book;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BookTableModel extends AbstractTableModel {
     private final String[] columnNames = {"id", "title", "author", "available_copies"};
@@ -13,6 +12,11 @@ public class BookTableModel extends AbstractTableModel {
 
     public BookTableModel(ArrayList<Book> book) {
         this.books = book;
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
     }
 
     @Override
@@ -55,6 +59,11 @@ public class BookTableModel extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false; // Allow editing
+    }
+
+    public void removeRow(int rowIndex) {
+        books.remove(rowIndex);
+        fireTableRowsDeleted(rowIndex, rowIndex);
     }
 
     @Override
