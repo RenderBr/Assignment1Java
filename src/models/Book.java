@@ -24,6 +24,10 @@ public class Book extends DBModel {
             default_value = "0")
     public int availableCopies;
 
+    public Book(){
+        super();
+    }
+
     public Book(ResultSet set) throws SQLException, IllegalAccessException {
         super(set);
     }

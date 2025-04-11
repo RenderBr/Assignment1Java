@@ -46,6 +46,18 @@ public class LibraryService {
         }};
     }
 
+    public <T extends DBModel> DatabaseRepository<T> getRepository(Class<T> modelClass) {
+        if (modelClass == Book.class) {
+            return (DatabaseRepository<T>) bookRepository;
+        } else if (modelClass == Borrower.class) {
+            return (DatabaseRepository<T>) borrowerRepository;
+        } else if (modelClass == BorrowedBook.class) {
+            return (DatabaseRepository<T>) borrowedBooksRepository;
+        }
+
+        throw new RuntimeException("Invalid model class: " + modelClass.getSimpleName());
+    }
+
     public void beginLibraryConsoleService() {
         running = true;
         scanner = new Scanner(input);

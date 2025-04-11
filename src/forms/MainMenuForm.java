@@ -1,10 +1,11 @@
 package forms;
 
-import forms.listeners.ManageBooksListener;
+import forms.listeners.OpenModelManagerListener;
+import models.Book;
+import models.BorrowedBook;
+import models.Borrower;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainMenuForm extends JFrame {
     private JButton returnABookButton;
@@ -22,7 +23,9 @@ public class MainMenuForm extends JFrame {
         setLocationRelativeTo(null);
         setContentPane(mainFrame);
 
-        manageBooksButton.addActionListener(new ManageBooksListener());
+        manageBooksButton.addActionListener(new OpenModelManagerListener<>(Book.class));
+        manageBorrowersButton.addActionListener(new OpenModelManagerListener<>(Borrower.class));
+        returnABookButton.addActionListener(new OpenModelManagerListener<>(BorrowedBook.class));
     }
 
 }

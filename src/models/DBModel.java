@@ -34,7 +34,8 @@ public abstract class DBModel {
         }
     }
 
-    public DBModel() {
+    public DBModel()
+    {
     }
 
     public String getUpdateQuery(){

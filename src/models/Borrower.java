@@ -28,6 +28,11 @@ public class Borrower extends DBModel {
         this.email = email;
     }
 
+
+    public Borrower(){
+        super();
+    }
+
     @Override
     public String toString() {
         return String.format("Borrower %s\n\tName: %s\n\tEmail: %s", id, name, email);
