@@ -1,3 +1,9 @@
+/*
+    COMP305 - Java Application Development
+    Assignment 2 - Library Management System
+    Julian Seitz
+*/
+
 package models;
 
 import db.annotations.Column;
@@ -35,6 +41,6 @@ public class Borrower extends DBModel {
 
     @Override
     public String toString() {
-        return String.format("Borrower %s\n\tName: %s\n\tEmail: %s", id, name, email);
+        return String.format("#%s | %s | Email: %s", id, name, email);
     }
 }

@@ -1,10 +1,15 @@
+/*
+    COMP305 - Java Application Development
+    Assignment 2 - Library Management System
+    Julian Seitz
+*/
+
 package forms.listeners;
 
 import app.Main;
 import db.annotations.Column;
 import forms.models.NumericalValidator;
 import forms.tables.ModelProvider;
-import models.Book;
 import models.DBModel;
 import models.TitleCase;
 

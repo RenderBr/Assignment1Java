@@ -1,3 +1,9 @@
+/*
+    COMP305 - Java Application Development
+    Assignment 2 - Library Management System
+    Julian Seitz
+*/
+
 package models;
 
 import db.annotations.Column;
@@ -6,7 +12,6 @@ import db.annotations.TableName;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 
 @TableName(name = "books")
 public class Book extends DBModel {
@@ -40,7 +45,7 @@ public class Book extends DBModel {
 
     @Override
     public String toString() {
-        return String.format("- Book of ID: %s\n\t- Title: %s\n\t- Author: %s\n\t- Available Copies: %s", id, title, author, availableCopies);
+        return String.format("#%s | %s by %s | %s available copies", id, title, author, availableCopies);
     }
 
 }

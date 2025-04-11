@@ -1,3 +1,9 @@
+/*
+    COMP305 - Java Application Development
+    Assignment 2 - Library Management System
+    Julian Seitz
+*/
+
 package db.annotations;
 
 import java.lang.annotation.Retention;

@@ -1,3 +1,9 @@
+/*
+    COMP305 - Java Application Development
+    Assignment 2 - Library Management System
+    Julian Seitz
+*/
+
 package models;
 
 import db.annotations.Column;
@@ -65,6 +71,6 @@ public class BorrowedBook extends DBModel {
 
     @Override
     public String toString(){
-        return String.format("Borrowed Book, of ID: %s\n\tBorrower ID: %s\n\tBook ID: %s\n\tBorrowed Date: %s\n\tReturn Date: %s", id, borrowerId, bookId, borrow_date.toString(), (return_date == null ? "has not been returned!" : return_date.toString()));
+        return String.format("#%s | Borrower ID: %s | Book ID: %s | Borrowed Date: %s | Return Date: %s", id, borrowerId, bookId, borrow_date.toString(), (return_date == null ? "has not been returned!" : return_date.toString()));
     }
 }

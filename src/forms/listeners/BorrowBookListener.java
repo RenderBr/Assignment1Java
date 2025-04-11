@@ -1,3 +1,9 @@
+/*
+    COMP305 - Java Application Development
+    Assignment 2 - Library Management System
+    Julian Seitz
+ */
+
 package forms.listeners;
 
 import app.Main;
@@ -31,30 +37,24 @@ public class BorrowBookListener implements ActionListener {
 
         // Date pickers
         Calendar calendar = Calendar.getInstance();
-        JSpinner yearSpinner = new JSpinner(new SpinnerNumberModel(calendar.get(Calendar.YEAR), 1900, 2100, 1));
-        JSpinner monthSpinner = new JSpinner(new SpinnerNumberModel(calendar.get(Calendar.MONTH) + 1, 1, 12, 1));
-        JSpinner daySpinner = new JSpinner(new SpinnerNumberModel(calendar.get(Calendar.DAY_OF_MONTH), 1, 31, 1));
+        JSpinner yearSpinner = new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.YEAR));
 
-        JPanel panel = new JPanel(new GridLayout(0, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(0, 1, 0, 5));
         panel.add(new JLabel("Select Book:"));
         panel.add(bookComboBox);
         panel.add(new JLabel("Select Borrower:"));
         panel.add(borrowerComboBox);
-        panel.add(new JLabel("Return Year:"));
+
+        panel.add(Box.createHorizontalStrut(10));
+
+        panel.add(new JLabel("Borrowed on:"));
         panel.add(yearSpinner);
-        panel.add(new JLabel("Return Month:"));
-        panel.add(monthSpinner);
-        panel.add(new JLabel("Return Day:"));
-        panel.add(daySpinner);
 
         int option = JOptionPane.showConfirmDialog(null, panel, "Borrow Book", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (option == JOptionPane.OK_OPTION) {
             Book selectedBook = (Book) bookComboBox.getSelectedItem();
             Borrower selectedBorrower = (Borrower) borrowerComboBox.getSelectedItem();
-            int year = (int) yearSpinner.getValue();
-            int month = (int) monthSpinner.getValue() - 1; // Calendar months are 0-based
-            int day = (int) daySpinner.getValue();
 
             // Validate selections
             if (selectedBook == null || selectedBorrower == null) {
@@ -67,13 +67,11 @@ public class BorrowBookListener implements ActionListener {
                 return;
             }
 
-            // Set due date
-            Calendar returnCalendar = Calendar.getInstance();
-            returnCalendar.set(year, month-1, day);
-            Date dueDate = (Date) returnCalendar.getTime();
+            // Get the selected date
+            Date borrowedDate = new Date(((java.util.Date) yearSpinner.getValue()).getTime());
 
             // Attempt to borrow
-            BorrowedBook borrowedBook = new BorrowedBook(selectedBook, selectedBorrower, dueDate);
+            BorrowedBook borrowedBook = new BorrowedBook(selectedBook, selectedBorrower, borrowedDate);
 
             // Check if the book is already borrowed
             var existing = Main.libraryService.borrowedBooksRepository.filter(
@@ -88,7 +86,10 @@ public class BorrowBookListener implements ActionListener {
 
             // Save the borrowed book
             BorrowedBook borrowedBookInsert = Main.libraryService.borrowedBooksRepository.insert(borrowedBook);
-            
+
+            selectedBook.availableCopies--;
+            Main.libraryService.bookRepository.update(selectedBook);
+
             if (borrowedBookInsert != null) {
                 JOptionPane.showMessageDialog(null, "Book borrowed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             } else {
