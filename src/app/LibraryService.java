@@ -86,7 +86,7 @@ public class LibraryService {
         }
     }
 
-    private void borrowBook() {
+    public void borrowBook() {
         var book = findBookFromInput();
         if (book == null) {
             return;
